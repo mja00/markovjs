@@ -46,9 +46,12 @@ const rest = new REST().setToken(token);
         console.log(`Successfully reloaded ${data.length} application (/) commands.`);
         // Now do our private commands
         console.log(`Started refreshing ${privateCommands.length} private application (/) commands.`);
+        // Combine the public and private commands
+        const allCommands = privateCommands.concat(commands);
+        // And deploy them
         const privateData = await rest.put(
             Routes.applicationGuildCommands(clientId, privateGuildId),
-            { body: privateCommands },
+            { body: allCommands },
         );
         console.log(`Successfully reloaded ${privateData.length} private application (/) commands.`);
     } catch (error) {

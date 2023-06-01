@@ -12,15 +12,16 @@ module.exports = {
     async execute(interaction) {
         const commandName = interaction.options.getString('command', true).toLowerCase();
         const command = interaction.client.commands.get(commandName);
+        const commandPath = interaction.client.commandsPath.get(commandName);
 
         if (!command) {
             return interaction.reply(`There is no command with name \`${commandName}\`.`);
         }
 
-        delete require.cache[require.resolve(`./${command.data.name}.js`)];
+        delete require.cache[require.resolve(commandPath)];
         try {
             interaction.client.commands.delete(command.data.name);
-            const newCommand = require(`./${command.data.name}.js`);
+            const newCommand = require(commandPath);
             interaction.client.commands.set(newCommand.data.name, newCommand);
             return interaction.reply(`Command \`${command.data.name}\` was reloaded!`);
         } catch (error) {

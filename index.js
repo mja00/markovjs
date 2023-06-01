@@ -13,6 +13,7 @@ const client = new Client({
 });
 
 client.commands = new Collection();
+client.commandsPath = new Collection();
 client.cooldowns = new Collection();
 
 // Get our command path
@@ -29,6 +30,8 @@ for (const folder of commandFolders) {
         // Set a new item
         if ('data' in command && 'execute' in command) {
             client.commands.set(command.data.name, command);
+            // Also set where the command lives
+            client.commandsPath.set(command.data.name, filePath);
         } else {
             console.log(`WARNING: ${filePath} does not export a command.`);
         }
