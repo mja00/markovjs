@@ -13,6 +13,7 @@ const client = new Client({
 });
 
 client.commands = new Collection();
+client.cooldowns = new Collection();
 
 // Get our command path
 const foldersPath = path.join(__dirname, 'commands');
