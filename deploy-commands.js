@@ -1,9 +1,10 @@
 const { REST, Routes } = require('discord.js');
-const { clientId, guildId, token } = require('./config.json');
+const { clientId, guildId, token, privateGuildId } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
 
 const commands = [];
+const privateCommands = [];
 // Grab all the command files from the commands directory you created earlier
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
@@ -17,7 +18,11 @@ for (const folder of commandFolders) {
         const filePath = path.join(commandsPath, file);
         const command = require(filePath);
         if ('data' in command && 'execute' in command) {
-            commands.push(command.data.toJSON());
+            if ('private' in command) {
+                privateCommands.push(command.data.toJSON());
+            } else {
+                commands.push(command.data.toJSON());
+            }
         } else {
             console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
         }
@@ -39,6 +44,13 @@ const rest = new REST().setToken(token);
         );
 
         console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+        // Now do our private commands
+        console.log(`Started refreshing ${privateCommands.length} private application (/) commands.`);
+        const privateData = await rest.put(
+            Routes.applicationGuildCommands(clientId, privateGuildId),
+            { body: privateCommands },
+        );
+        console.log(`Successfully reloaded ${privateData.length} private application (/) commands.`);
     } catch (error) {
         // And of course, make sure you catch and log any errors!
         console.error(error);
